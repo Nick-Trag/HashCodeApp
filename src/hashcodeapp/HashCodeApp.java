@@ -47,33 +47,7 @@ public class HashCodeApp {
         
         rides = new Ride[n];
         vehicles = new Vehicle[f];
-        rideBook = new ArrayList<>(r);
-        System.out.println(r);
-        System.out.println(rideBook.size());
-        for (int i = 0; i < r; i++) {
-            rideBook.set(i,new ArrayList<>());
-        }
-        /*String line;
-        while ((line = in.readLine()) != null)
-        {
-            tk = new StringTokenizer(line);
 
-            String []list = new String[tk.countTokens()];
-
-            int i = 0;
-
-            while (tk.hasMoreTokens())
-            {
-                list[i] = tk.nextToken();
-                i++;
-                rides[i].start = new Pair(parseInt(tk.nextToken()),parseInt(tk.nextToken()));
-                System.out.println(i);
-                rides[i].end = new Pair(parseInt(tk.nextToken()),parseInt(tk.nextToken()));
-                rides[i].s = parseInt(tk.nextToken());
-                rides[i].f = parseInt(tk.nextToken());
-                rides[i].index = i;
-            }
-        }*/
         for (int i = 0; i < n; i ++) {
             String s = in.readLine();
             String [] str = s.split(" ");
@@ -84,53 +58,18 @@ public class HashCodeApp {
             int index = i;
             rides[i] = new Ride(start,end,st,f,index);
         }
-        
-        for (int i = 0; i < n; i++) {
-            rideBook.get(rides[i].start.a).add(rides[i]);
-        }
-        
+
         MyMergeSort mms = new MyMergeSort();
-        for (int i = 0; i < r; i++) {
-            mms.sort(rideBook.get(i));
-        }
-        
-        int v = r / f;
-        
-        for (int i = 0; i < f; i++) {
-            int steps = 0;
-            for (int j = v*i; j < v*(i+1); j++)
+        mms.sort(rides);
+
+        for (int i = 0; i < t; i++)
+        {
+            for (int j = 0; j < f; j++)
             {
-                for (int k = 0; k < rideBook.get(j).size(); k++)
-                {
-                    Pair loc = new Pair(0,0);
-                    loc.a = vehicles[i].location.a;
-                    loc.b = vehicles[i].location.b;
-                    if (check(rideBook.get(j).get(k), loc, steps, i)) {
-                        vehicles[i].location = rideBook.get(j).get(k).start;
-                        steps += Math.abs(loc.a - vehicles[i].location.a) + Math.abs(loc.b - vehicles[i].location.b);
-                        if (steps>t) {
-                            break;
-                        }
-                        else {
-                            loc.a = vehicles[i].location.a;
-                            loc.b = vehicles[i].location.b;
-                            vehicles[i].location = rideBook.get(j).get(k).end;
-                            steps += Math.abs(loc.a - vehicles[i].location.a) + Math.abs(loc.b - vehicles[i].location.b);
-                        }
-                        if (steps > t) {
-                            break;
-                        }
-                        vehicles[i].ridesNum++;
-                        vehicles[i].rides.add(rideBook.get(j).get(k));
-                    }
-                }
+
             }
-            out.append(vehicles[i].ridesNum).append(" ");
-            for (int j = 0; j < vehicles[i].ridesNum; j++) {
-                out.append(vehicles[i].rides.get(j).index).append(" ");
-            }
-            out.append("\n");
         }
+
     }
     public static boolean check(Ride ride, Pair loc, int steps, int i) {
         if (Math.abs(loc.a - vehicles[i].location.a) + Math.abs(loc.b - vehicles[i].location.b) + steps <= ride.f) {
@@ -145,8 +84,8 @@ public class HashCodeApp {
 
 class MyMergeSort {
      
-    private ArrayList<Ride> array;
-    private ArrayList<Ride> tempMergArr;
+    private Ride[] array;
+    private Ride[] tempMergArr;
     private int length;
  
     /*public static void main(String a[]){
@@ -160,10 +99,10 @@ class MyMergeSort {
         }
     }*/
      
-    public void sort(ArrayList<Ride> inputArr) {
+    public void sort(Ride[] inputArr) {
         this.array = inputArr;
-        this.length = inputArr.size();
-        this.tempMergArr = new ArrayList<>();
+        this.length = inputArr.length;
+        this.tempMergArr = new Ride[length];
         doMergeSort(0, length - 1);
     }
  
@@ -183,23 +122,23 @@ class MyMergeSort {
     private void mergeParts(int lowerIndex, int middle, int higherIndex) {
  
         for (int i = lowerIndex; i <= higherIndex; i++) {
-            tempMergArr.set(i, array.get(i));
+            tempMergArr[i] = array[i];
         }
         int i = lowerIndex;
         int j = middle + 1;
         int k = lowerIndex;
         while (i <= middle && j <= higherIndex) {
-            if (tempMergArr.get(i).f <= tempMergArr.get(i).f) {
-                array.set(k, tempMergArr.get(i));
+            if (tempMergArr[i].f <= tempMergArr[i].f) {
+                array[k] = tempMergArr[i];
                 i++;
             } else {
-                array.set(k, tempMergArr.get(j));
+                array[k] = tempMergArr[j];
                 j++;
             }
             k++;
         }
         while (i <= middle) {
-            array.set(k, tempMergArr.get(i));
+            array[k] = tempMergArr[i];
             k++;
             i++;
         }
