@@ -58,13 +58,17 @@ public class HashCodeApp {
             int index = i;
             rides[i] = new Ride(start,end,st,f,index);
         }
+        for (int i = 0; i < f; i++)
+        {
+            vehicles[i] = new Vehicle();
+        }
 
         MyMergeSort mms = new MyMergeSort();
         mms.sort(rides);
 
-        for (int i = 0; i < t; i++)
+        for (int i = 0; i < t; i++) //Every step of the simulation
         {
-            for (int j = 0; j < f; j++)
+            for (int j = 0; j < f; j++) //Every vehicle
             {
 
             }
