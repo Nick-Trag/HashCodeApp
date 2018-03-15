@@ -14,12 +14,12 @@ public class JudgeSystem
 
     public static void main(String[] args) throws IOException
     {
-        BufferedReader in=new BufferedReader(new FileReader("e_high_bonus.in"));
-        StringBuilder out=new StringBuilder();
+        BufferedReader in=new BufferedReader(new FileReader("a_example.in"));
+        //StringBuilder out=new StringBuilder();
         StringTokenizer tk;
 
 
-        PrintWriter pw=new PrintWriter(new File("output_e.txt"));
+        //PrintWriter pw=new PrintWriter(new File("output_a_example.txt"));
 
         tk = new StringTokenizer(in.readLine());
         r=parseInt(tk.nextToken());
@@ -48,28 +48,42 @@ public class JudgeSystem
             vehicles[i] = new Vehicle();
         }
 
-        BufferedReader in2 =new BufferedReader(new FileReader("output_e.txt"));
-        StringTokenizer stk;
+        BufferedReader in2 =new BufferedReader(new FileReader("output_a_example.txt"));
+        //StringTokenizer stk;
         int points = 0;
         for (int i = 0; i < f; i++) //Every vehicle
         {
-            stk = new StringTokenizer(in2.readLine());
-
-            int ridesNum = parseInt(stk.nextToken());
+            String s = in2.readLine();
+            //stk = new StringTokenizer(in2.readLine());
+            String[] str = s.split(" ");
+            int ridesNum = parseInt(str[0]);
+            int steps =0;
             ArrayList<Ride> vRides = new ArrayList<>();
             for (int j = 0; j < ridesNum; j++) //Every ride the vehicle has completed
             {
-                int rideNum = parseInt(stk.nextToken());
+                int rideNum = parseInt(str[j + 1]);
                 vRides.add(rides[rideNum]);
             }
-            for (Ride ride : vRides)
-            {
-                points+=ride.getDistance();
-                if () //Check if this ride gets bonus points
-                {
 
+            for (int j = 0; j < ridesNum; j++)
+            {
+                if (Math.abs(vRides.get(j).start.a - vehicles[i].location.a) + Math.abs(vRides.get(j).start.b - vehicles[i].location.b) + steps + vRides.get(j).getDistance() > vRides.get(j).f)
+                {
+                    System.out.println("You fucked up");
                 }
+                steps+= Math.abs(vRides.get(j).start.a - vehicles[i].location.a) + Math.abs(vRides.get(j).start.b - vehicles[i].location.b);// + vRides.get(j).getDistance();
+                if (steps < vRides.get(j).s)
+                {
+                    steps = vRides.get(j).s + vRides.get(j).getDistance();
+                }
+                points+=vRides.get(j).getDistance();
+                if (vRides.get(j).s >= Math.abs(vehicles[i].location.a - vRides.get(j).start.a) + Math.abs(vehicles[i].location.b - vRides.get(j).start.b)) //Check if this ride gets bonus points
+                {
+                    points+=b;
+                }
+                vehicles[i].location = new Pair(vRides.get(j).end.a , vRides.get(j).end.b);
             }
         }
+        System.out.println("Points: " + points + " for a");
     }
 }

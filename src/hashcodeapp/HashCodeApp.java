@@ -82,10 +82,12 @@ public class HashCodeApp {
                         {
                             if (check(rides[k], vehicles[j], i))
                             {
-                                vehicles[j].assign(rides[k]);
-                                rides[k].assigned = true;
-                                //Assign
-                                break;
+                                if (i + Math.abs(vehicles[j].location.a - rides[k].start.a) + Math.abs(vehicles[j].location.b - rides[k].start.b) >= rides[k].s)
+                                {
+                                    vehicles[j].assign(rides[k]);
+                                    rides[k].assigned = true;
+                                    break;
+                                }
                             }
                         }
                     }
