@@ -30,12 +30,12 @@ public class HashCodeApp {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        BufferedReader in=new BufferedReader(new FileReader("a_example.in"));
+        BufferedReader in=new BufferedReader(new FileReader("e_high_bonus.in"));
         StringBuilder out=new StringBuilder();
         StringTokenizer tk;
         
         
-        PrintWriter pw=new PrintWriter(new File("output_a_example.txt"));
+        PrintWriter pw=new PrintWriter(new File("output_e.txt"));
         
         tk = new StringTokenizer(in.readLine());
         r=parseInt(tk.nextToken());
@@ -70,7 +70,10 @@ public class HashCodeApp {
         {
             for (int j = 0; j < f; j++) //Every vehicle
             {
-                //May be necessary to check if a vehicle has reached its destination here and unassign it, and delete the Ride (or ignore it)
+                if (vehicles[j].getRideEnd() == i)
+                {
+                    vehicles[j].unassign();
+                }
                 if (!vehicles[j].assigned)
                 {
                     for (int k = 0; k < n; k++) //Every ride
@@ -79,6 +82,8 @@ public class HashCodeApp {
                         {
                             if (check(rides[k], vehicles[j], i))
                             {
+                                vehicles[j].assign(rides[k]);
+                                rides[k].assigned = true;
                                 //Assign
                                 break;
                             }
@@ -87,11 +92,26 @@ public class HashCodeApp {
                 }
             }
         }
+
+        for (Vehicle v : vehicles)
+        {
+            if (v.ridesNum > 0)
+            {
+                out.append(v.ridesNum);
+                for (int i = 0; i < v.rides.size(); i++)
+                {
+                    out.append(" ").append(v.rides.get(i));
+                }
+                out.append("\n");
+            }
+        }
+        pw.print(out);
+        pw.close();
     }
 
 
     public static boolean check(Ride ride, Vehicle vehicle, int steps) {
-        return Math.abs(ride.start.a - vehicle.location.a) + Math.abs(ride.start.b - vehicle.location.b) + steps + Math.abs(ride.end.a - ride.start.a) + Math.abs(ride.end.b - ride.start.b) <= ride.f;
+        return Math.abs(ride.start.a - vehicle.location.a) + Math.abs(ride.start.b - vehicle.location.b) + steps + ride.getDistance() <= ride.f;
     }
     
     
@@ -194,12 +214,41 @@ class Vehicle {
     public Pair location;
     public int ridesNum;
     public boolean assigned;
-    public ArrayList<Ride> rides;
+    public Ride assignedRide;
+    public ArrayList<Integer> rides;
     
-    public Vehicle() {
+    public Vehicle()
+    {
         location = new Pair(0,0);
         ridesNum = 0;
         assigned = false;
         rides = new ArrayList<>();
+        assignedRide = null;
+    }
+
+    public void assign(Ride ride)
+    {
+        assignedRide = new Ride(ride.start,ride.end,ride.s,ride.f,ride.index);
+        assigned = true;
+        ridesNum++;
+        rides.add(ride.index);
+    }
+
+    public int getRideEnd()
+    {
+        if (assignedRide != null)
+        {
+            return assignedRide.f;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    public void unassign()
+    {
+        assignedRide = null;
+        assigned = false;
     }
 }
