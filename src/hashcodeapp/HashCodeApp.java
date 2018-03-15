@@ -70,14 +70,18 @@ public class HashCodeApp {
         {
             for (int j = 0; j < f; j++) //Every vehicle
             {
+                //May be necessary to check if a vehicle has reached its destination here and unassign it, and delete the Ride (or ignore it)
                 if (!vehicles[j].assigned)
                 {
-                    for (int k = 0; k < n; k++)
+                    for (int k = 0; k < n; k++) //Every ride
                     {
-                        if (check(rides[k],vehicles[j],i))
+                        if (!rides[k].assigned)
                         {
-                            //Assign
-                            break;
+                            if (check(rides[k], vehicles[j], i))
+                            {
+                                //Assign
+                                break;
+                            }
                         }
                     }
                 }
