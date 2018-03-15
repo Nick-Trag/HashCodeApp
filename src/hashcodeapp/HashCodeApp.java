@@ -70,16 +70,24 @@ public class HashCodeApp {
         {
             for (int j = 0; j < f; j++) //Every vehicle
             {
-
+                if (!vehicles[j].assigned)
+                {
+                    for (int k = 0; k < n; k++)
+                    {
+                        if (check(rides[k],vehicles[j],i))
+                        {
+                            //Assign
+                            break;
+                        }
+                    }
+                }
             }
         }
-
     }
-    public static boolean check(Ride ride, Pair loc, int steps, int i) {
-        if (Math.abs(loc.a - vehicles[i].location.a) + Math.abs(loc.b - vehicles[i].location.b) + steps <= ride.f) {
-            return true;
-        }
-        return false;
+
+
+    public static boolean check(Ride ride, Vehicle vehicle, int steps) {
+        return Math.abs(ride.start.a - vehicle.location.a) + Math.abs(ride.start.b - vehicle.location.b) + steps + Math.abs(ride.end.a - ride.start.a) + Math.abs(ride.end.b - ride.start.b) <= ride.f;
     }
     
     
