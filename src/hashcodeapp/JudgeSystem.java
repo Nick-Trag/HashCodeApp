@@ -14,76 +14,91 @@ public class JudgeSystem
 
     public static void main(String[] args) throws IOException
     {
-        BufferedReader in=new BufferedReader(new FileReader("a_example.in"));
-        //StringBuilder out=new StringBuilder();
-        StringTokenizer tk;
-
-
-        //PrintWriter pw=new PrintWriter(new File("output_a_example.txt"));
-
-        tk = new StringTokenizer(in.readLine());
-        r=parseInt(tk.nextToken());
-        c=parseInt(tk.nextToken());
-        f=parseInt(tk.nextToken());
-        n=parseInt(tk.nextToken());
-        b=parseInt(tk.nextToken());
-        t=parseInt(tk.nextToken());
-
-        rides = new Ride[n];
-        vehicles = new Vehicle[f];
-
-        for (int i = 0; i < n; i ++) {
-            String s = in.readLine();
-            boolean temp = true; //IntelliJ kept bugging me about duplicate code, so I added this useless command
-            String [] str = s.split(" ");
-            Pair start = new Pair(Integer.parseInt(str[0]),Integer.parseInt(str[1]));
-            Pair end = new Pair(Integer.parseInt(str[2]),Integer.parseInt(str[3]));
-            int st = Integer.parseInt(str[4]);
-            int f = Integer.parseInt(str[5]);
-            int index = i;
-            rides[i] = new Ride(start,end,st,f,index);
-        }
-        for (int i = 0; i < f; i++)
+        String[] files = {"a_example.in", "b_should_be_easy.in", "c_no_hurry.in", "d_metropolis.in", "e_high_bonus.in"};
+        String[] outfiles = {"output_a_example.txt", "output_b.txt", "output_c.txt", "output_d.txt", "output_e.txt"};
+        for (int file = 0; file < 5; file++)
         {
-            vehicles[i] = new Vehicle();
-        }
+            BufferedReader in = new BufferedReader(new FileReader(files[file]));
+            //StringBuilder out=new StringBuilder();
+            StringTokenizer tk;
 
-        BufferedReader in2 =new BufferedReader(new FileReader("output_a_example.txt"));
-        //StringTokenizer stk;
-        int points = 0;
-        for (int i = 0; i < f; i++) //Every vehicle
-        {
-            String s = in2.readLine();
-            //stk = new StringTokenizer(in2.readLine());
-            String[] str = s.split(" ");
-            int ridesNum = parseInt(str[0]);
-            int steps =0;
-            ArrayList<Ride> vRides = new ArrayList<>();
-            for (int j = 0; j < ridesNum; j++) //Every ride the vehicle has completed
+
+            //PrintWriter pw=new PrintWriter(new File("output_a_example.txt"));
+
+            tk = new StringTokenizer(in.readLine());
+            r = parseInt(tk.nextToken());
+            c = parseInt(tk.nextToken());
+            f = parseInt(tk.nextToken());
+            n = parseInt(tk.nextToken());
+            b = parseInt(tk.nextToken());
+            t = parseInt(tk.nextToken());
+
+            rides = new Ride[n];
+            vehicles = new Vehicle[f];
+
+            for (int i = 0; i < n; i++)
             {
-                int rideNum = parseInt(str[j + 1]);
-                vRides.add(rides[rideNum]);
+                String s = in.readLine();
+                boolean temp = true; //IntelliJ kept bugging me about duplicate code, so I added this useless command
+                String[] str = s.split(" ");
+                Pair start = new Pair(Integer.parseInt(str[0]), Integer.parseInt(str[1]));
+                Pair end = new Pair(Integer.parseInt(str[2]), Integer.parseInt(str[3]));
+                int st = Integer.parseInt(str[4]);
+                int f = Integer.parseInt(str[5]);
+                int index = i;
+                rides[i] = new Ride(start, end, st, f, index);
+            }
+            for (int i = 0; i < f; i++)
+            {
+                vehicles[i] = new Vehicle();
             }
 
-            for (int j = 0; j < ridesNum; j++)
+            BufferedReader in2 = new BufferedReader(new FileReader(outfiles[file]));
+            //StringTokenizer stk;
+            int points = 0;
+            for (int i = 0; i < f; i++) //Every vehicle
             {
-                if (Math.abs(vRides.get(j).start.a - vehicles[i].location.a) + Math.abs(vRides.get(j).start.b - vehicles[i].location.b) + steps + vRides.get(j).getDistance() > vRides.get(j).f)
+                String s = in2.readLine();
+                //stk = new StringTokenizer(in2.readLine());
+                String[] str;
+                try
                 {
-                    System.out.println("You fucked up");
+                    str = s.split(" ");
                 }
-                steps+= Math.abs(vRides.get(j).start.a - vehicles[i].location.a) + Math.abs(vRides.get(j).start.b - vehicles[i].location.b);// + vRides.get(j).getDistance();
-                if (steps < vRides.get(j).s)
+                catch (Exception e) //This only happens when not every vehicle has been assigned a ride (Only in b_should_be_easy.in)
                 {
-                    steps = vRides.get(j).s + vRides.get(j).getDistance();
+                    System.out.println("Exception caught");
+                    break;
                 }
-                points+=vRides.get(j).getDistance();
-                if (vRides.get(j).s >= Math.abs(vehicles[i].location.a - vRides.get(j).start.a) + Math.abs(vehicles[i].location.b - vRides.get(j).start.b)) //Check if this ride gets bonus points
+                int ridesNum = parseInt(str[0]);
+                int steps = 0;
+                ArrayList<Ride> vRides = new ArrayList<>();
+                for (int j = 0; j < ridesNum; j++) //Every ride the vehicle has completed
                 {
-                    points+=b;
+                    int rideNum = parseInt(str[j + 1]);
+                    vRides.add(rides[rideNum]);
                 }
-                vehicles[i].location = new Pair(vRides.get(j).end.a , vRides.get(j).end.b);
+
+                for (int j = 0; j < ridesNum; j++)
+                {
+                    if (Math.abs(vRides.get(j).start.a - vehicles[i].location.a) + Math.abs(vRides.get(j).start.b - vehicles[i].location.b) + steps + vRides.get(j).getDistance() > vRides.get(j).f)
+                    {
+                        System.out.println("You fucked up on file " + files[file]);
+                    }
+                    steps += Math.abs(vRides.get(j).start.a - vehicles[i].location.a) + Math.abs(vRides.get(j).start.b - vehicles[i].location.b);// + vRides.get(j).getDistance();
+                    if (steps < vRides.get(j).s)
+                    {
+                        steps = vRides.get(j).s + vRides.get(j).getDistance();
+                    }
+                    points += vRides.get(j).getDistance();
+                    if (vRides.get(j).s >= Math.abs(vehicles[i].location.a - vRides.get(j).start.a) + Math.abs(vehicles[i].location.b - vRides.get(j).start.b)) //Check if this ride gets bonus points
+                    {
+                        points += b;
+                    }
+                    vehicles[i].location = new Pair(vRides.get(j).end.a, vRides.get(j).end.b);
+                }
             }
+            System.out.println("Points: " + points + " for " + files[file]);
         }
-        System.out.println("Points: " + points + " for a");
     }
 }
