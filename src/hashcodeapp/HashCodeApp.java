@@ -30,85 +30,92 @@ public class HashCodeApp {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        BufferedReader in=new BufferedReader(new FileReader("e_high_bonus.in"));
-        StringBuilder out=new StringBuilder();
-        StringTokenizer tk;
-        
-        
-        PrintWriter pw=new PrintWriter(new File("output_e.txt"));
-        
-        tk = new StringTokenizer(in.readLine());
-        r=parseInt(tk.nextToken());
-        c=parseInt(tk.nextToken());
-        f=parseInt(tk.nextToken());
-        n=parseInt(tk.nextToken());
-        b=parseInt(tk.nextToken());
-        t=parseInt(tk.nextToken());
-        
-        rides = new Ride[n];
-        vehicles = new Vehicle[f];
-
-        for (int i = 0; i < n; i ++) {
-            String s = in.readLine();
-            String [] str = s.split(" ");
-            Pair start = new Pair(Integer.parseInt(str[0]),Integer.parseInt(str[1]));
-            Pair end = new Pair(Integer.parseInt(str[2]),Integer.parseInt(str[3]));
-            int st = Integer.parseInt(str[4]);
-            int f = Integer.parseInt(str[5]);
-            int index = i;
-            rides[i] = new Ride(start,end,st,f,index);
-        }
-        for (int i = 0; i < f; i++)
+        String[] files = {"a_example.in", "b_should_be_easy.in", "c_no_hurry.in", "d_metropolis.in", "e_high_bonus.in"};
+        String[] outfiles = {"output_a_example.txt", "output_b.txt", "output_c.txt", "output_d.txt", "output_e.txt"};
+        for (int file = 0; file < 5; file++)
         {
-            vehicles[i] = new Vehicle();
-        }
+            System.out.println("Working on file " + files[file]);
+            BufferedReader in = new BufferedReader(new FileReader(files[file]));
+            StringBuilder out = new StringBuilder();
+            StringTokenizer tk;
 
-        MyMergeSort mms = new MyMergeSort();
-        mms.sort(rides);
 
-        for (int i = 0; i < t; i++) //Every step of the simulation
-        {
-            for (int j = 0; j < f; j++) //Every vehicle
+            PrintWriter pw = new PrintWriter(new File(outfiles[file]));
+
+            tk = new StringTokenizer(in.readLine());
+            r = parseInt(tk.nextToken());
+            c = parseInt(tk.nextToken());
+            f = parseInt(tk.nextToken());
+            n = parseInt(tk.nextToken());
+            b = parseInt(tk.nextToken());
+            t = parseInt(tk.nextToken());
+
+            rides = new Ride[n];
+            vehicles = new Vehicle[f];
+
+            for (int i = 0; i < n; i++)
             {
-                if (vehicles[j].getRideEnd() == i)
+                String s = in.readLine();
+                String[] str = s.split(" ");
+                Pair start = new Pair(Integer.parseInt(str[0]), Integer.parseInt(str[1]));
+                Pair end = new Pair(Integer.parseInt(str[2]), Integer.parseInt(str[3]));
+                int st = Integer.parseInt(str[4]);
+                int f = Integer.parseInt(str[5]);
+                int index = i;
+                rides[i] = new Ride(start, end, st, f, index);
+            }
+            for (int i = 0; i < f; i++)
+            {
+                vehicles[i] = new Vehicle();
+            }
+
+            MyMergeSort mms = new MyMergeSort();
+            mms.sort(rides);
+
+            for (int i = 0; i < t; i++) //Every step of the simulation
+            {
+                for (int j = 0; j < f; j++) //Every vehicle
                 {
-                    vehicles[j].unassign();
-                }
-                if (!vehicles[j].assigned)
-                {
-                    for (int k = 0; k < n; k++) //Every ride
+                    if (vehicles[j].getRideEnd() == i)
                     {
-                        if (!rides[k].assigned)
+                        vehicles[j].unassign();
+                    }
+                    if (!vehicles[j].assigned)
+                    {
+                        for (int k = 0; k < n; k++) //Every ride
                         {
-                            if (check(rides[k], vehicles[j], i))
+                            if (!rides[k].assigned)
                             {
-                                if (i + Math.abs(vehicles[j].location.a - rides[k].start.a) + Math.abs(vehicles[j].location.b - rides[k].start.b) >= rides[k].s)
+                                if (check(rides[k], vehicles[j], i))
                                 {
-                                    vehicles[j].assign(rides[k]);
-                                    rides[k].assigned = true;
-                                    break;
+                                    if (i + Math.abs(vehicles[j].location.a - rides[k].start.a) + Math.abs(vehicles[j].location.b - rides[k].start.b) >= rides[k].s)
+                                    {
+                                        vehicles[j].assign(rides[k]);
+                                        rides[k].assigned = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
 
-        for (Vehicle v : vehicles)
-        {
-            if (v.ridesNum > 0)
+            for (Vehicle v : vehicles)
             {
-                out.append(v.ridesNum);
-                for (int i = 0; i < v.rides.size(); i++)
+                if (v.ridesNum > 0)
                 {
-                    out.append(" ").append(v.rides.get(i));
+                    out.append(v.ridesNum);
+                    for (int i = 0; i < v.rides.size(); i++)
+                    {
+                        out.append(" ").append(v.rides.get(i));
+                    }
+                    out.append("\n");
                 }
-                out.append("\n");
             }
+            pw.print(out);
+            pw.close();
         }
-        pw.print(out);
-        pw.close();
     }
 
 
