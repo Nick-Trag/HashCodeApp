@@ -24,7 +24,7 @@ public class HashCodeApp {
     static int r,c,f,n,b,t;
     static Ride[] rides;
     static Vehicle[] vehicles;
-    static ArrayList<ArrayList<Ride>> rideBook;
+    //static ArrayList<ArrayList<Ride>> rideBook;
     
     /**
      * @param args the command line arguments
@@ -76,7 +76,7 @@ public class HashCodeApp {
             {
                 for (int j = 0; j < f; j++) //Every vehicle
                 {
-                    if (vehicles[j].getRideEnd() == i)
+                    if (/*vehicles[j].getRideEnd() == i*/ vehicles[j].assigned && (i - vehicles[j].assignedRideStartStep == vehicles[j].getRideDistance())) //If the Ride-distance steps have passed since the Ride was assigned
                     {
                         vehicles[j].unassign();
                     }
@@ -90,7 +90,7 @@ public class HashCodeApp {
                                 {
                                     if (i + Math.abs(vehicles[j].location.a - rides[k].start.a) + Math.abs(vehicles[j].location.b - rides[k].start.b) >= rides[k].s)
                                     {
-                                        vehicles[j].assign(rides[k]);
+                                        vehicles[j].assign(rides[k],i);
                                         rides[k].assigned = true;
                                         break;
                                     }
@@ -119,7 +119,7 @@ public class HashCodeApp {
     }
 
 
-    public static boolean check(Ride ride, Vehicle vehicle, int steps) {
+    private static boolean check(Ride ride, Vehicle vehicle, int steps) {
         return Math.abs(ride.start.a - vehicle.location.a) + Math.abs(ride.start.b - vehicle.location.b) + steps + ride.getDistance() <= ride.f;
     }
     
@@ -224,6 +224,7 @@ class Vehicle {
     public int ridesNum;
     public boolean assigned;
     public Ride assignedRide;
+    public int assignedRideStartStep;
     public ArrayList<Integer> rides;
     
     public Vehicle()
@@ -233,14 +234,28 @@ class Vehicle {
         assigned = false;
         rides = new ArrayList<>();
         assignedRide = null;
+        assignedRideStartStep = -1;
     }
 
-    public void assign(Ride ride)
+    public void assign(Ride ride, int step)
     {
         assignedRide = new Ride(ride.start,ride.end,ride.s,ride.f,ride.index);
         assigned = true;
         ridesNum++;
+        assignedRideStartStep = step;
         rides.add(ride.index);
+    }
+
+    public int getRideDistance()
+    {
+        if (assignedRide != null)
+        {
+            return Math.abs(assignedRide.start.a - assignedRide.end.a) + Math.abs(assignedRide.start.b - assignedRide.end.b);
+        }
+        else
+        {
+            return -1;
+        }
     }
 
     public int getRideEnd()
@@ -257,7 +272,9 @@ class Vehicle {
 
     public void unassign()
     {
+        location = new Pair(assignedRide.end.a,assignedRide.end.b);
         assignedRide = null;
+        assignedRideStartStep = -1;
         assigned = false;
     }
 }

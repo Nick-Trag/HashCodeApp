@@ -14,6 +14,7 @@ public class JudgeSystem
 
     public static void main(String[] args) throws IOException
     {
+        int totalPoints = 0;
         String[] files = {"a_example.in", "b_should_be_easy.in", "c_no_hurry.in", "d_metropolis.in", "e_high_bonus.in"};
         String[] outfiles = {"output_a_example.txt", "output_b.txt", "output_c.txt", "output_d.txt", "output_e.txt"};
         for (int file = 0; file < 5; file++)
@@ -83,12 +84,16 @@ public class JudgeSystem
                 {
                     if (Math.abs(vRides.get(j).start.a - vehicles[i].location.a) + Math.abs(vRides.get(j).start.b - vehicles[i].location.b) + steps + vRides.get(j).getDistance() > vRides.get(j).f)
                     {
-                        System.out.println("You fucked up on file " + files[file]);
+                        System.out.println("You fucked up on file " + files[file] + ", vehicle #" + i + ", ride #" + j + " (index " + vRides.get(j).index + ")");
                     }
                     steps += Math.abs(vRides.get(j).start.a - vehicles[i].location.a) + Math.abs(vRides.get(j).start.b - vehicles[i].location.b);// + vRides.get(j).getDistance();
                     if (steps < vRides.get(j).s)
                     {
                         steps = vRides.get(j).s + vRides.get(j).getDistance();
+                    }
+                    else
+                    {
+                        steps+= vRides.get(j).getDistance();
                     }
                     points += vRides.get(j).getDistance();
                     if (vRides.get(j).s >= Math.abs(vehicles[i].location.a - vRides.get(j).start.a) + Math.abs(vehicles[i].location.b - vRides.get(j).start.b)) //Check if this ride gets bonus points
@@ -98,7 +103,9 @@ public class JudgeSystem
                     vehicles[i].location = new Pair(vRides.get(j).end.a, vRides.get(j).end.b);
                 }
             }
+            totalPoints+=points;
             System.out.println("Points: " + points + " for " + files[file]);
         }
+        System.out.println("Total points: " + totalPoints);
     }
 }
