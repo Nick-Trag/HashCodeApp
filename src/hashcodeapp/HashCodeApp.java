@@ -96,7 +96,7 @@ public class HashCodeApp {
             {
                 for (int j = 0; j < f; j++) //Every vehicle
                 {
-                    if (/*vehicles[j].getRideEnd() == i*/ vehicles[j].assigned && (i - vehicles[j].assignedRideStartStep == vehicles[j].getRideDistance())) //If the Ride-distance steps have passed since the Ride was assigned
+                    if (/*vehicles[j].getRideEnd() == i*/ vehicles[j].assigned && (i == vehicles[j].assignedRideStartStep + vehicles[j].getDistanceToRideStart() + vehicles[j].getRideDistance())) //If the Ride-distance steps have passed since the Ride was assigned
                     {
                         vehicles[j].unassign();
                     }
@@ -298,5 +298,10 @@ class Vehicle {
         assignedRide = null;
         assignedRideStartStep = -1;
         assigned = false;
+    }
+
+    public int getDistanceToRideStart()
+    {
+        return Math.abs(location.a - assignedRide.start.a) + Math.abs(location.b - assignedRide.start.b);
     }
 }
