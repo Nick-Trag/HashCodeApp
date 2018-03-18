@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import static java.lang.Integer.parseInt;
 import java.util.ArrayList;
+import java.util.Collections;
+//import java.util.Comparator;
 import java.util.StringTokenizer;
-import org.apache.commons.net.*;
+//import org.apache.commons.net.*;
 
 /**
  *
@@ -23,7 +25,7 @@ import org.apache.commons.net.*;
 public class HashCodeApp {
 
     static int r,c,f,n,b,t;
-    static Ride[] rides;
+    static ArrayList<Ride> rides;
     static Vehicle[] vehicles;
     //static ArrayList<ArrayList<Ride>> rideBook;
     
@@ -51,7 +53,7 @@ public class HashCodeApp {
             b = parseInt(tk.nextToken());
             t = parseInt(tk.nextToken());
 
-            rides = new Ride[n];
+            rides = new ArrayList<>();
             vehicles = new Vehicle[f];
 
             for (int i = 0; i < n; i++)
@@ -63,15 +65,32 @@ public class HashCodeApp {
                 int st = Integer.parseInt(str[4]);
                 int f = Integer.parseInt(str[5]);
                 int index = i;
-                rides[i] = new Ride(start, end, st, f, index);
+                rides.add(new Ride(start, end, st, f, index));
             }
             for (int i = 0; i < f; i++)
             {
                 vehicles[i] = new Vehicle();
             }
 
-            MyMergeSort mms = new MyMergeSort();
-            mms.sort(rides);
+            //MyMergeSort mms = new MyMergeSort();
+            //mms.sort(rides);
+
+            Collections.sort(rides, (o1, o2) ->
+            {
+                //Compare o1 with o2
+                if (o1.f < o2.f)
+                {
+                    return -1;
+                }
+                else if (o1.f == o2.f)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            });
 
             for (int i = 0; i < t; i++) //Every step of the simulation
             {
@@ -83,21 +102,21 @@ public class HashCodeApp {
                     }
                     if (!vehicles[j].assigned)
                     {
-                        for (int k = 0; k < n; k++) //Every ride
+                        for (int k = 0; k < rides.size(); k++) //Every ride
                         {
-                            if (!rides[k].assigned)
+                            //if (!rides.get(k).assigned)
+                            //{
+                            if (HashCodeApp.check(rides.get(k), vehicles[j], i))
                             {
-                                if (HashCodeApp.check(rides[k], vehicles[j], i))
+                                if (i + Math.abs(vehicles[j].location.a - rides.get(k).start.a) + Math.abs(vehicles[j].location.b - rides.get(k).start.b) >= rides.get(k).s)
                                 {
-                                    if (i + Math.abs(vehicles[j].location.a - rides[k].start.a) + Math.abs(vehicles[j].location.b - rides[k].start.b) >= rides[k].s)
-                                    {
-                                        vehicles[j].assign(rides[k],i);
-                                        rides[k].assigned = true;
-                                        //rides = ArrayUtils.remove(rides, k);
-                                        break;
-                                    }
+                                    vehicles[j].assign(rides.get(k),i);
+                                    //rides.get(k).assigned = true;
+                                    rides.remove(k);
+                                    break;
                                 }
                             }
+                            //}
                         }
                     }
                 }
@@ -130,10 +149,10 @@ public class HashCodeApp {
     
 }
 
-class MyMergeSort {
+/*class MyMergeSort {
      
-    private Ride[] array;
-    private Ride[] tempMergArr;
+    private ArrayList<Ride> array;
+    private ArrayList<Ride> tempMergArr;
     private int length;
  
     /*public static void main(String a[]){
@@ -145,12 +164,12 @@ class MyMergeSort {
             System.out.print(i);
             System.out.print(" ");
         }
-    }*/
+    }*
      
-    public void sort(Ride[] inputArr) {
+    public void sort(ArrayList<Ride> inputArr) {
         this.array = inputArr;
-        this.length = inputArr.length;
-        this.tempMergArr = new Ride[length];
+        this.length = inputArr.size();
+        this.tempMergArr = new ArrayList<>(length);
         doMergeSort(0, length - 1);
     }
  
@@ -170,29 +189,29 @@ class MyMergeSort {
     private void mergeParts(int lowerIndex, int middle, int higherIndex) {
  
         for (int i = lowerIndex; i <= higherIndex; i++) {
-            tempMergArr[i] = array[i];
+            tempMergArr.add(i,array.get(i));
         }
         int i = lowerIndex;
         int j = middle + 1;
         int k = lowerIndex;
         while (i <= middle && j <= higherIndex) {
-            if (tempMergArr[i].f <= tempMergArr[i].f) {
-                array[k] = tempMergArr[i];
+            if (tempMergArr.get(i).f <= tempMergArr.get(i).f) {
+                array.set(k,tempMergArr.get(i));
                 i++;
             } else {
-                array[k] = tempMergArr[j];
+                array.set(k, tempMergArr.get(j));
                 j++;
             }
             k++;
         }
         while (i <= middle) {
-            array[k] = tempMergArr[i];
+            array.set(k, tempMergArr.get(i));
             k++;
             i++;
         }
  
     }
-}
+}*/
 
 class Pair {
     public int a,b;
@@ -206,7 +225,7 @@ class Pair {
 class Ride {
     public int s,f,index;
     public Pair start,end;
-    public boolean assigned;
+    //public boolean assigned;
     
     public Ride(Pair start, Pair end, int s, int f,int i) {
         this.start = start;
@@ -214,7 +233,7 @@ class Ride {
         this.f = f;
         this.s = s;
         index = i;
-        assigned = false;
+        //assigned = false;
     }
     
     public int getDistance() {
