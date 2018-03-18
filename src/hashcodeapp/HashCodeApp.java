@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import static java.lang.Integer.parseInt;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import org.apache.commons.net.*;
 
 /**
  *
@@ -40,7 +41,7 @@ public class HashCodeApp {
             StringTokenizer tk;
 
 
-            PrintWriter pw = new PrintWriter(new File(outfiles[file]));
+
 
             tk = new StringTokenizer(in.readLine());
             r = parseInt(tk.nextToken());
@@ -86,12 +87,13 @@ public class HashCodeApp {
                         {
                             if (!rides[k].assigned)
                             {
-                                if (check(rides[k], vehicles[j], i))
+                                if (HashCodeApp.check(rides[k], vehicles[j], i))
                                 {
                                     if (i + Math.abs(vehicles[j].location.a - rides[k].start.a) + Math.abs(vehicles[j].location.b - rides[k].start.b) >= rides[k].s)
                                     {
                                         vehicles[j].assign(rides[k],i);
                                         rides[k].assigned = true;
+                                        //rides = ArrayUtils.remove(rides, k);
                                         break;
                                     }
                                 }
@@ -113,6 +115,7 @@ public class HashCodeApp {
                     out.append("\n");
                 }
             }
+            PrintWriter pw = new PrintWriter(new File(outfiles[file]));
             pw.print(out);
             pw.close();
         }
@@ -250,7 +253,7 @@ class Vehicle {
     {
         if (assignedRide != null)
         {
-            return Math.abs(assignedRide.start.a - assignedRide.end.a) + Math.abs(assignedRide.start.b - assignedRide.end.b);
+            return assignedRide.getDistance();
         }
         else
         {
