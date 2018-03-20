@@ -13,7 +13,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import static java.lang.Integer.parseInt;
 import java.util.ArrayList;
+import java.util.Collections;
+//import java.util.Comparator;
 import java.util.StringTokenizer;
+//import org.apache.commons.net.*;
 
 /**
  *
@@ -22,128 +25,131 @@ import java.util.StringTokenizer;
 public class HashCodeApp {
 
     static int r,c,f,n,b,t;
-    static Ride[] rides;
+    static ArrayList<Ride> rides;
     static Vehicle[] vehicles;
-    static ArrayList<ArrayList<Ride>> rideBook;
+    //static ArrayList<ArrayList<Ride>> rideBook;
     
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        BufferedReader in=new BufferedReader(new FileReader("a_example.in"));
-        StringBuilder out=new StringBuilder();
-        StringTokenizer tk;
-        
-        
-        PrintWriter pw=new PrintWriter(new File("output_a_example.txt"));
-        
-        tk = new StringTokenizer(in.readLine());
-        r=parseInt(tk.nextToken());
-        c=parseInt(tk.nextToken());
-        f=parseInt(tk.nextToken());
-        n=parseInt(tk.nextToken());
-        b=parseInt(tk.nextToken());
-        t=parseInt(tk.nextToken());
-        
-        rides = new Ride[n];
-        vehicles = new Vehicle[f];
-        rideBook = new ArrayList<>(r);
-        System.out.println(r);
-        System.out.println(rideBook.size());
-        for (int i = 0; i < r; i++) {
-            rideBook.set(i,new ArrayList<>());
-        }
-        /*String line;
-        while ((line = in.readLine()) != null)
+        String[] files = {"a_example.in", "b_should_be_easy.in", "c_no_hurry.in", "d_metropolis.in", "e_high_bonus.in"};
+        String[] outfiles = {"output_a_example.txt", "output_b.txt", "output_c.txt", "output_d.txt", "output_e.txt"};
+        for (int file = 0; file < 5; file++)
         {
-            tk = new StringTokenizer(line);
+            System.out.println("Working on file " + files[file]);
+            BufferedReader in = new BufferedReader(new FileReader(files[file]));
+            StringBuilder out = new StringBuilder();
+            StringTokenizer tk;
 
-            String []list = new String[tk.countTokens()];
 
-            int i = 0;
 
-            while (tk.hasMoreTokens())
+
+            tk = new StringTokenizer(in.readLine());
+            r = parseInt(tk.nextToken());
+            c = parseInt(tk.nextToken());
+            f = parseInt(tk.nextToken());
+            n = parseInt(tk.nextToken());
+            b = parseInt(tk.nextToken());
+            t = parseInt(tk.nextToken());
+
+            rides = new ArrayList<>();
+            vehicles = new Vehicle[f];
+
+            for (int i = 0; i < n; i++)
             {
-                list[i] = tk.nextToken();
-                i++;
-                rides[i].start = new Pair(parseInt(tk.nextToken()),parseInt(tk.nextToken()));
-                System.out.println(i);
-                rides[i].end = new Pair(parseInt(tk.nextToken()),parseInt(tk.nextToken()));
-                rides[i].s = parseInt(tk.nextToken());
-                rides[i].f = parseInt(tk.nextToken());
-                rides[i].index = i;
+                String s = in.readLine();
+                String[] str = s.split(" ");
+                Pair start = new Pair(Integer.parseInt(str[0]), Integer.parseInt(str[1]));
+                Pair end = new Pair(Integer.parseInt(str[2]), Integer.parseInt(str[3]));
+                int st = Integer.parseInt(str[4]);
+                int f = Integer.parseInt(str[5]);
+                int index = i;
+                rides.add(new Ride(start, end, st, f, index));
             }
-        }*/
-        for (int i = 0; i < n; i ++) {
-            String s = in.readLine();
-            String [] str = s.split(" ");
-            Pair start = new Pair(Integer.parseInt(str[0]),Integer.parseInt(str[1]));
-            Pair end = new Pair(Integer.parseInt(str[2]),Integer.parseInt(str[3]));
-            int st = Integer.parseInt(str[4]);
-            int f = Integer.parseInt(str[5]);
-            int index = i;
-            rides[i] = new Ride(start,end,st,f,index);
-        }
-        
-        for (int i = 0; i < n; i++) {
-            rideBook.get(rides[i].start.a).add(rides[i]);
-        }
-        
-        MyMergeSort mms = new MyMergeSort();
-        for (int i = 0; i < r; i++) {
-            mms.sort(rideBook.get(i));
-        }
-        
-        int v = r / f;
-        
-        for (int i = 0; i < f; i++) {
-            int steps = 0;
-            for (int j = v*i; j < v*(i+1); j++)
+            for (int i = 0; i < f; i++)
             {
-                for (int k = 0; k < rideBook.get(j).size(); k++)
+                vehicles[i] = new Vehicle();
+            }
+
+            //MyMergeSort mms = new MyMergeSort();
+            //mms.sort(rides);
+
+            Collections.sort(rides, (o1, o2) ->
+            {
+                //Compare o1 with o2
+                if (o1.f < o2.f)
                 {
-                    Pair loc = new Pair(0,0);
-                    loc.a = vehicles[i].location.a;
-                    loc.b = vehicles[i].location.b;
-                    if (check(rideBook.get(j).get(k), loc, steps, i)) {
-                        vehicles[i].location = rideBook.get(j).get(k).start;
-                        steps += Math.abs(loc.a - vehicles[i].location.a) + Math.abs(loc.b - vehicles[i].location.b);
-                        if (steps>t) {
-                            break;
+                    return -1;
+                }
+                else if (o1.f == o2.f)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
+            });
+
+            for (int i = 0; i < t; i++) //Every step of the simulation
+            {
+                for (int j = 0; j < f; j++) //Every vehicle
+                {
+                    if (/*vehicles[j].getRideEnd() == i*/ vehicles[j].assigned && (i == vehicles[j].assignedRideStartStep + vehicles[j].getDistanceToRideStart() + vehicles[j].getRideDistance())) //If the Ride-distance steps have passed since the Ride was assigned
+                    {
+                        vehicles[j].unassign();
+                    }
+                    if (!vehicles[j].assigned)
+                    {
+                        for (int k = 0; k < rides.size(); k++) //Every ride
+                        {
+                            //if (!rides.get(k).assigned)
+                            //{
+                            if (HashCodeApp.check(rides.get(k), vehicles[j], i))
+                            {
+                                if (i + Math.abs(vehicles[j].location.a - rides.get(k).start.a) + Math.abs(vehicles[j].location.b - rides.get(k).start.b) >= rides.get(k).s)
+                                {
+                                    vehicles[j].assign(rides.get(k),i);
+                                    //rides.get(k).assigned = true;
+                                    rides.remove(k);
+                                    break;
+                                }
+                            }
+                            //}
                         }
-                        else {
-                            loc.a = vehicles[i].location.a;
-                            loc.b = vehicles[i].location.b;
-                            vehicles[i].location = rideBook.get(j).get(k).end;
-                            steps += Math.abs(loc.a - vehicles[i].location.a) + Math.abs(loc.b - vehicles[i].location.b);
-                        }
-                        if (steps > t) {
-                            break;
-                        }
-                        vehicles[i].ridesNum++;
-                        vehicles[i].rides.add(rideBook.get(j).get(k));
                     }
                 }
             }
-            out.append(vehicles[i].ridesNum).append(" ");
-            for (int j = 0; j < vehicles[i].ridesNum; j++) {
-                out.append(vehicles[i].rides.get(j).index).append(" ");
+
+            for (Vehicle v : vehicles)
+            {
+                if (v.ridesNum > 0)
+                {
+                    out.append(v.ridesNum);
+                    for (int i = 0; i < v.rides.size(); i++)
+                    {
+                        out.append(" ").append(v.rides.get(i));
+                    }
+                    out.append("\n");
+                }
             }
-            out.append("\n");
+            PrintWriter pw = new PrintWriter(new File(outfiles[file]));
+            pw.print(out);
+            pw.close();
         }
     }
-    public static boolean check(Ride ride, Pair loc, int steps, int i) {
-        if (Math.abs(loc.a - vehicles[i].location.a) + Math.abs(loc.b - vehicles[i].location.b) + steps <= ride.f) {
-            return true;
-        }
-        return false;
+
+
+    private static boolean check(Ride ride, Vehicle vehicle, int steps) {
+        return Math.abs(ride.start.a - vehicle.location.a) + Math.abs(ride.start.b - vehicle.location.b) + steps + ride.getDistance() <= ride.f;
     }
     
     
     
 }
 
-class MyMergeSort {
+/*class MyMergeSort {
      
     private ArrayList<Ride> array;
     private ArrayList<Ride> tempMergArr;
@@ -158,12 +164,12 @@ class MyMergeSort {
             System.out.print(i);
             System.out.print(" ");
         }
-    }*/
+    }*
      
     public void sort(ArrayList<Ride> inputArr) {
         this.array = inputArr;
         this.length = inputArr.size();
-        this.tempMergArr = new ArrayList<>();
+        this.tempMergArr = new ArrayList<>(length);
         doMergeSort(0, length - 1);
     }
  
@@ -183,14 +189,14 @@ class MyMergeSort {
     private void mergeParts(int lowerIndex, int middle, int higherIndex) {
  
         for (int i = lowerIndex; i <= higherIndex; i++) {
-            tempMergArr.set(i, array.get(i));
+            tempMergArr.add(i,array.get(i));
         }
         int i = lowerIndex;
         int j = middle + 1;
         int k = lowerIndex;
         while (i <= middle && j <= higherIndex) {
             if (tempMergArr.get(i).f <= tempMergArr.get(i).f) {
-                array.set(k, tempMergArr.get(i));
+                array.set(k,tempMergArr.get(i));
                 i++;
             } else {
                 array.set(k, tempMergArr.get(j));
@@ -205,7 +211,7 @@ class MyMergeSort {
         }
  
     }
-}
+}*/
 
 class Pair {
     public int a,b;
@@ -219,7 +225,7 @@ class Pair {
 class Ride {
     public int s,f,index;
     public Pair start,end;
-    public boolean assigned;
+    //public boolean assigned;
     
     public Ride(Pair start, Pair end, int s, int f,int i) {
         this.start = start;
@@ -227,7 +233,7 @@ class Ride {
         this.f = f;
         this.s = s;
         index = i;
-        assigned = false;
+        //assigned = false;
     }
     
     public int getDistance() {
@@ -239,12 +245,63 @@ class Vehicle {
     public Pair location;
     public int ridesNum;
     public boolean assigned;
-    public ArrayList<Ride> rides;
+    public Ride assignedRide;
+    public int assignedRideStartStep;
+    public ArrayList<Integer> rides;
     
-    public Vehicle() {
+    public Vehicle()
+    {
         location = new Pair(0,0);
         ridesNum = 0;
         assigned = false;
         rides = new ArrayList<>();
+        assignedRide = null;
+        assignedRideStartStep = -1;
+    }
+
+    public void assign(Ride ride, int step)
+    {
+        assignedRide = new Ride(ride.start,ride.end,ride.s,ride.f,ride.index);
+        assigned = true;
+        ridesNum++;
+        assignedRideStartStep = step;
+        rides.add(ride.index);
+    }
+
+    public int getRideDistance()
+    {
+        if (assignedRide != null)
+        {
+            return assignedRide.getDistance();
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    public int getRideEnd()
+    {
+        if (assignedRide != null)
+        {
+            return assignedRide.f;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    public void unassign()
+    {
+        location = new Pair(assignedRide.end.a,assignedRide.end.b);
+        assignedRide = null;
+        assignedRideStartStep = -1;
+        assigned = false;
+    }
+
+    public int getDistanceToRideStart()
+    {
+        return Math.abs(location.a - assignedRide.start.a) + Math.abs(location.b - assignedRide.start.b);
     }
 }
